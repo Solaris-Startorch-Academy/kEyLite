@@ -1,0 +1,132 @@
+<UserControl x:Class="kEyLite.Views.OverviewPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid Margin="28,20,28,20">
+        <!-- 锁定面板：打开页面后先在这里输入密码，解锁后才显示密钥 -->
+        <StackPanel x:Name="UnlockPanel"
+                    Visibility="Collapsed"
+                    VerticalAlignment="Center" HorizontalAlignment="Center"
+                    MaxWidth="420">
+            <materialDesign:PackIcon Kind="ShieldLock"
+                                     Width="46" Height="46"
+                                     Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                     HorizontalAlignment="Center" />
+            <TextBlock Text="kEyLite 已锁定" FontSize="21" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" Margin="0,12,0,0" />
+            <TextBlock Text="输入访问密码以查看你的密钥。"
+                       Opacity="0.7" HorizontalAlignment="Center" Margin="0,6,0,0" />
+
+            <PasswordBox x:Name="UnlockPasswordBox"
+                         Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                         materialDesign:HintAssist.Hint="访问密码"
+                         Margin="0,18,0,0"
+                         KeyDown="UnlockPasswordBox_KeyDown" />
+            <TextBlock x:Name="UnlockErrorText"
+                       Visibility="Collapsed"
+                       HorizontalAlignment="Center" Margin="0,10,0,0"
+                       Foreground="{DynamicResource MaterialDesignValidationErrorBrush}" />
+            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                    Content="解锁" IsDefault="True"
+                    HorizontalAlignment="Center" Margin="0,16,0,0"
+                    Click="Unlock_Click" />
+        </StackPanel>
+
+        <!-- 已解锁内容 -->
+        <Grid x:Name="ContentPanel">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="密钥概览" FontSize="26" FontWeight="SemiBold" />
+                <TextBlock x:Name="CountText"
+                           VerticalAlignment="Center" Margin="14,3,0,0" Opacity="0.6" />
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,16,0,0">
+                <ItemsControl x:Name="KeysList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <materialDesign:Card Margin="0,0,0,12" Padding="18,14" UniformCornerRadius="12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Title}" FontSize="17" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding Subtitle}" Opacity="0.65" Margin="0,3,0,0" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="14,0,0,0">
+                                        <TextBlock Text="{Binding Code}"
+                                                   FontSize="26" FontWeight="Bold"
+                                                   FontFamily="Consolas"
+                                                   HorizontalAlignment="Right" />
+                                        <ProgressBar Value="{Binding Progress, Mode=OneWay}"
+                                                     Maximum="1"
+                                                     Height="4"
+                                                     Width="160"
+                                                     Margin="0,6,0,0"
+                                                     HorizontalAlignment="Right" />
+                                        <TextBlock Text="{Binding RemainingText}"
+                                                   HorizontalAlignment="Right"
+                                                   FontSize="11" Opacity="0.6" Margin="0,4,0,0" />
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="18,0,0,0">
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                ToolTip="复制验证码"
+                                                Click="Copy_Click"
+                                                Tag="{Binding}">
+                                            <materialDesign:PackIcon Kind="ContentCopy" Width="20" Height="20" />
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                ToolTip="重命名"
+                                                Click="Rename_Click"
+                                                Tag="{Binding}">
+                                            <materialDesign:PackIcon Kind="Pencil" Width="20" Height="20" />
+                                        </Button>
+                                        <Button Style="{StaticResource MaterialDesignIconButton}"
+                                                ToolTip="删除密钥"
+                                                Click="Delete_Click"
+                                                Tag="{Binding}">
+                                            <materialDesign:PackIcon Kind="DeleteOutline" Width="20" Height="20" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </materialDesign:Card>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- 空状态 -->
+            <StackPanel x:Name="EmptyState" Grid.Row="1"
+                        VerticalAlignment="Center" HorizontalAlignment="Center"
+                        Visibility="Collapsed">
+                <Image Source="pack://application:,,,/kEyLite;component/Assets/Stickers/光辉矢愿_不可以看.png"
+                       Width="220" Height="220"
+                       HorizontalAlignment="Center"
+                       RenderOptions.BitmapScalingMode="HighQuality" />
+                <TextBlock Text="呀，这里还没有任何密钥呢～" FontSize="19" FontWeight="SemiBold"
+                           Margin="0,16,0,0" HorizontalAlignment="Center" />
+                <TextBlock Text="点击下方按钮去添加一个密钥吧。"
+                           Opacity="0.65" Margin="0,6,0,0" HorizontalAlignment="Center" />
+                <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                        HorizontalAlignment="Center" Margin="0,18,0,0"
+                        Click="GotoAdd_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="PlusCircle" Width="18" Height="18" VerticalAlignment="Center" />
+                        <TextBlock Text="添加密钥" Margin="8,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

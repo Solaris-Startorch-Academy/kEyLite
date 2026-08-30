@@ -1,0 +1,9 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- kEyLite 自定义字体声明：HarmonyOS Sans SC 四个字重。
+         fallback 链：嵌入式字体 → 系统 HarmonyOS Sans SC → 微软雅黑 → 黑体 -->
+    <FontFamily x:Key="HarmonyOsSansRegular">/kEyLite;component/Assets/Fonts/#HarmonyOS Sans SC</FontFamily>
+    <FontFamily x:Key="HarmonyOsSansBold">/kEyLite;component/Assets/Fonts/#HarmonyOS Sans SC Bold</FontFamily>
+    <FontFamily x:Key="HarmonyOsSansMedium">/kEyLite;component/Assets/Fonts/#HarmonyOS Sans SC Medium</FontFamily>
+    <FontFamily x:Key="HarmonyOsSansLight">/kEyLite;component/Assets/Fonts/#HarmonyOS Sans SC Light</FontFamily>
+</ResourceDictionary>

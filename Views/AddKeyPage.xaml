@@ -1,0 +1,150 @@
+<UserControl x:Class="kEyLite.Views.AddKeyPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid Margin="28,20,28,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="添加密钥" FontSize="26" FontWeight="SemiBold" />
+
+        <TabControl Grid.Row="1" Margin="0,14,0,0" Background="Transparent">
+
+            <!-- 方式一：手动输入 -->
+            <TabItem Header="手动输入">
+                <Grid MaxWidth="560" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,20,4,4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <TextBox x:Name="IssuerBox"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="签发者（如 GitHub）" />
+                    <TextBox x:Name="LabelBox"
+                             Grid.Column="2"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="显示名称 / 账户" />
+
+                    <TextBox x:Name="SecretBox"
+                             Grid.Row="1" Grid.ColumnSpan="3"
+                             Margin="0,14,0,0"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             FontFamily="Consolas"
+                             materialDesign:HintAssist.Hint="密钥（如 JBSWY3DPEHPK3PXP）" />
+
+                    <ComboBox x:Name="AlgorithmBox" Grid.Row="2" SelectedIndex="0" Margin="0,14,0,0">
+                        <ComboBoxItem Content="SHA1" Tag="SHA1" />
+                        <ComboBoxItem Content="SHA256" Tag="SHA256" />
+                        <ComboBoxItem Content="SHA512" Tag="SHA512" />
+                    </ComboBox>
+                    <ComboBox x:Name="DigitsBox" Grid.Row="2" Grid.Column="2" SelectedIndex="0" Margin="0,14,0,0">
+                        <ComboBoxItem Content="6 位" Tag="6" />
+                        <ComboBoxItem Content="7 位" Tag="7" />
+                        <ComboBoxItem Content="8 位" Tag="8" />
+                    </ComboBox>
+
+                    <ComboBox x:Name="PeriodBox" Grid.Row="3" SelectedIndex="0" Margin="0,14,0,0">
+                        <ComboBoxItem Content="30 秒" Tag="30" />
+                        <ComboBoxItem Content="60 秒" Tag="60" />
+                    </ComboBox>
+
+                    <Button Grid.Row="4" Grid.ColumnSpan="3"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            HorizontalAlignment="Right" Margin="0,20,0,0"
+                            Click="ManualAdd_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ContentSave" Width="18" Height="18" VerticalAlignment="Center" />
+                            <TextBlock Text="保存密钥" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </TabItem>
+
+            <!-- 方式二：otpauth 链接 -->
+            <TabItem Header="URI（QR码解析内容）">
+                <StackPanel MaxWidth="640" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,20,4,4">
+                    <TextBox x:Name="LinkBox"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                             materialDesign:HintAssist.Hint="粘贴 otpauth://totp/… 链接"
+                             AcceptsReturn="True"
+                             TextWrapping="Wrap"
+                             Height="96"
+                             VerticalScrollBarVisibility="Auto"
+                             VerticalContentAlignment="Top" />
+
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                            HorizontalAlignment="Left" Margin="0,14,0,0"
+                            Click="ParseLink_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Link" Width="18" Height="18" VerticalAlignment="Center" />
+                            <TextBlock Text="解析链接" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Button>
+
+                    <StackPanel x:Name="LinkPreview" Visibility="Collapsed" Margin="0,16,0,0">
+                        <TextBlock Text="解析结果" FontSize="13" Opacity="0.6" />
+                        <TextBlock x:Name="LinkIssuerText" Margin="0,8,0,0" />
+                        <TextBlock x:Name="LinkLabelText" Margin="0,4,0,0" />
+                        <TextBlock x:Name="LinkDetailText" Margin="0,4,0,0" />
+                    </StackPanel>
+
+                    <Button x:Name="LinkAddButton"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            HorizontalAlignment="Left" Margin="0,18,0,0"
+                            IsEnabled="False"
+                            Click="LinkAdd_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="PlusCircle" Width="18" Height="18" VerticalAlignment="Center" />
+                            <TextBlock Text="添加密钥" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </TabItem>
+
+            <!-- 方式三：QR 码图片 -->
+            <TabItem Header="QR 码图片">
+                <StackPanel MaxWidth="640" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4,20,4,4">
+                    <TextBlock Text="选择一张包含二维码的图片文件（PNG / JPG / BMP / GIF）。"
+                               Opacity="0.7" TextWrapping="Wrap" />
+
+                    <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                            HorizontalAlignment="Left" Margin="0,14,0,0"
+                            Click="PickImage_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="QrcodeScan" Width="18" Height="18" VerticalAlignment="Center" />
+                            <TextBlock Text="选择图片文件…" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Button>
+
+                    <TextBlock x:Name="QrResultText"
+                               Visibility="Collapsed"
+                               Margin="0,16,0,0"
+                               TextWrapping="Wrap" />
+
+                    <Button x:Name="QrAddButton"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            HorizontalAlignment="Left" Margin="0,18,0,0"
+                            IsEnabled="False"
+                            Click="QrAdd_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="PlusCircle" Width="18" Height="18" VerticalAlignment="Center" />
+                            <TextBlock Text="添加密钥" Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

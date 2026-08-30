@@ -1,0 +1,40 @@
+<Application x:Class="kEyLite.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="LightBlue" SecondaryColor="LightBlue" />
+                <ResourceDictionary Source="pack://application:,,,/kEyLite;component/Assets/Fonts/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+
+            <FontFamily x:Key="MaterialDesignFont">/kEyLite;component/Assets/Fonts/#HarmonyOS Sans SC</FontFamily>
+            <FontFamily x:Key="DefaultAppFont">/kEyLite;component/Assets/Fonts/#HarmonyOS Sans SC</FontFamily>
+
+            <Style TargetType="{x:Type TextElement}">
+                <Setter Property="FontFamily" Value="{StaticResource DefaultAppFont}" />
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+            </Style>
+            <Style TargetType="{x:Type Control}">
+                <Setter Property="FontFamily" Value="{StaticResource DefaultAppFont}" />
+            </Style>
+            <Style TargetType="{x:Type ContentControl}">
+                <Setter Property="FontFamily" Value="{StaticResource DefaultAppFont}" />
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="FontFamily" Value="{StaticResource DefaultAppFont}" />
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+            </Style>
+            <Style TargetType="{x:Type Window}">
+                <Setter Property="FontFamily" Value="{StaticResource DefaultAppFont}" />
+                <Setter Property="Icon" Value="pack://application:,,,/kEyLite;component/Assets/AppLogo.png" />
+            </Style>
+            <Style TargetType="{x:Type UserControl}">
+                <Setter Property="FontFamily" Value="{StaticResource DefaultAppFont}" />
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

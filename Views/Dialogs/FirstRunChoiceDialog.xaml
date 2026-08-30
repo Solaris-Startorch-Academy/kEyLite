@@ -1,0 +1,48 @@
+<Window x:Class="kEyLite.Views.Dialogs.FirstRunChoiceDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="欢迎使用 kEyLite"
+        Width="470"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}">
+
+    <StackPanel Margin="30,28">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <Image Source="pack://application:,,,/kEyLite;component/Assets/AppLogo.png"
+                   Width="30" Height="30"
+                   RenderOptions.BitmapScalingMode="HighQuality"
+                   VerticalAlignment="Center" />
+            <TextBlock Text="欢迎使用 kEyLite" FontSize="21" FontWeight="SemiBold"
+                       Margin="10,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <TextBlock Margin="0,16,0,0" TextWrapping="Wrap" TextAlignment="Center" Opacity="0.85"
+                   Text="初始化完成！要不要现在就添加一个密钥，或者从备份文件导入数据？你也可以随时通过左侧「添加密钥」页面进行。" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,22,0,0">
+            <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                    Margin="0,0,10,0"
+                    Click="Add_Click">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="PlusCircle" Width="18" Height="18" VerticalAlignment="Center" />
+                    <TextBlock Text="添加密钥" Margin="8,0,0,0" />
+                </StackPanel>
+            </Button>
+            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Margin="0,0,10,0"
+                    Click="Import_Click">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="FileImport" Width="18" Height="18" VerticalAlignment="Center" />
+                    <TextBlock Text="导入数据" Margin="8,0,0,0" />
+                </StackPanel>
+            </Button>
+            <Button Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Content="稍后再说"
+                    Click="Later_Click" />
+        </StackPanel>
+    </StackPanel>
+</Window>

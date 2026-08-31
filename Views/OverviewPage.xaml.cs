@@ -160,14 +160,12 @@ public partial class OverviewPage : UserControl
     {
         if (sender is not FrameworkElement { Tag: KeyItem item }) return;
 
-        var result = MessageBox.Show(
+        if (!ConfirmDialog.Show(
             Window.GetWindow(this),
-            $"确定删除“{item.Title}”的密钥吗？此操作不可撤销。",
             "删除密钥",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
-
-        if (result != MessageBoxResult.Yes) return;
+            "确定删除\u201C" + item.Title + "\u201D的密钥吗？此操作不可撤销。",
+            confirmText: "删除"))
+            return;
 
         AppState.Vault?.Keys.Remove(item.Key);
         AppState.Save();

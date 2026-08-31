@@ -5,7 +5,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="LightBlue" SecondaryColor="LightBlue" />
+                <materialDesign:BundledTheme BaseTheme="Inherit" PrimaryColor="LightBlue" SecondaryColor="LightBlue" />
                 <ResourceDictionary Source="pack://application:,,,/kEyLite;component/Assets/Fonts/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
             </ResourceDictionary.MergedDictionaries>

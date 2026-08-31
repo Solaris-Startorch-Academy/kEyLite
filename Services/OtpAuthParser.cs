@@ -26,7 +26,7 @@ public static class OtpAuthParser
             int eq = part.IndexOf('=');
             if (eq <= 0) continue;
             string name = Uri.UnescapeDataString(part[..eq]).Trim();
-            string value = Uri.UnescapeDataString(part[(eq + 1)..]).Replace('+', ' ');
+            string value = Uri.UnescapeDataString(part[(eq + 1)..].Replace('+', ' '));
             query[name] = value;
         }
 

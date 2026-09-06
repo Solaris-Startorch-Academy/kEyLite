@@ -28,6 +28,7 @@ public partial class MainWindow : Window
 
     private readonly SnackbarMessageQueue _snackbar = new(TimeSpan.FromSeconds(3));
     private bool _navCollapsed;
+    private int _navAnimationVersion;
     private string _currentPageTitle = "密钥概览";
 
     public MainWindow()
@@ -123,6 +124,7 @@ public partial class MainWindow : Window
     private void CollapseButton_Click(object sender, RoutedEventArgs e)
     {
         _navCollapsed = !_navCollapsed;
+        int animationVersion = ++_navAnimationVersion;
         NavColumn.BeginAnimation(ColumnDefinition.WidthProperty, null);
         double from = NavColumn.ActualWidth;
         double to = _navCollapsed ? 72 : 232;
@@ -135,6 +137,7 @@ public partial class MainWindow : Window
         };
         widthAnimation.Completed += (_, _) =>
         {
+            if (animationVersion != _navAnimationVersion) return;
             NavColumn.BeginAnimation(ColumnDefinition.WidthProperty, null);
             NavColumn.Width = new GridLength(to);
         };
@@ -150,7 +153,11 @@ public partial class MainWindow : Window
             foreach (var element in textElements)
             {
                 var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(120));
-                fade.Completed += (_, _) => element.Visibility = Visibility.Collapsed;
+                fade.Completed += (_, _) =>
+                {
+                    if (animationVersion == _navAnimationVersion && _navCollapsed)
+                        element.Visibility = Visibility.Collapsed;
+                };
                 element.BeginAnimation(UIElement.OpacityProperty, fade);
             }
         }

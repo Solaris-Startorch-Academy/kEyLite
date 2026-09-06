@@ -33,7 +33,14 @@ public partial class AddKeyPage : UserControl
 
     private void Commit(TotpKey key)
     {
-        AppState.Vault.Keys.Add(key);
+        var vault = AppState.Vault;
+        if (vault is null)
+        {
+            MainWindow.Instance?.Enqueue("当前 kEyLite 已锁定，需要先解锁后再添加密钥！");
+            return;
+        }
+
+        vault.Keys.Add(key);
         AppState.Save();
 
         // 清空各表单

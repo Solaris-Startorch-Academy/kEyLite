@@ -327,10 +327,11 @@ public partial class App : Application
                 ContextMenu = BuildTrayMenu(),
             };
             _trayIcon.TrayMouseDoubleClick += (_, _) => ActivateMainWindow();
+            _trayIcon.ForceCreate();
         }
-        catch
+        catch (Exception ex)
         {
-            // 托盘不可用不影响主功能
+            Debug.WriteLine($"托盘初始化失败：{ex}");
         }
     }
 

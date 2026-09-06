@@ -13,64 +13,120 @@
         SnapsToDevicePixels="True">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="68" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="232" />
+            <ColumnDefinition x:Name="NavColumn" Width="232" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <!-- 侧边导航 -->
-        <DockPanel Grid.Column="0">
-            <StackPanel DockPanel.Dock="Top" Margin="20,22,20,18">
+        <DockPanel Grid.Row="1" Grid.Column="0">
+            <StackPanel DockPanel.Dock="Bottom" Margin="20,18,20,22">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="pack://application:,,,/kEyLite;component/Assets/AppLogo.png"
+                          <Image x:Name="BrandLogo"
+                              Source="pack://application:,,,/kEyLite;component/Assets/AppLogo.png"
                            Width="30" Height="30"
                            RenderOptions.BitmapScalingMode="HighQuality"
                            VerticalAlignment="Center" />
-                    <TextBlock Text="kEyLite"
+                          <TextBlock x:Name="BrandName"
+                               Text="kEyLite"
                                FontSize="22" FontWeight="SemiBold"
                                Margin="10,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
-                <TextBlock Text="v0.1-beta"
+                      <TextBlock x:Name="VersionText"
+                              Text="v1.0-preview"
                            Margin="4,8,0,0" Opacity="0.6" FontSize="12" />
             </StackPanel>
 
             <ListBox x:Name="NavList"
                      SelectionChanged="NavList_SelectionChanged"
-                     Margin="10,0,10,0"
+                     Margin="24,68,0,0"
                      BorderThickness="0"
                      Background="Transparent"
                      ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                <ListBoxItem Padding="10,11">
+                <ListBoxItem Padding="0,11">
                     <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="ViewDashboard" Width="22" Height="22" VerticalAlignment="Center" />
-                        <TextBlock Text="概览" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="14.5" />
+                        <Border Width="42" Height="22">
+                            <materialDesign:PackIcon Kind="ViewDashboard" Width="22" Height="22" HorizontalAlignment="Center" />
+                        </Border>
+                        <TextBlock x:Name="NavOverviewText" Text="概览" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="14.5" />
                     </StackPanel>
                 </ListBoxItem>
-                <ListBoxItem Padding="10,11">
+                <ListBoxItem Padding="0,11">
                     <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="PlusCircle" Width="22" Height="22" VerticalAlignment="Center" />
-                        <TextBlock Text="添加密钥" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="14.5" />
+                        <Border Width="42" Height="22">
+                            <materialDesign:PackIcon Kind="PlusCircle" Width="22" Height="22" HorizontalAlignment="Center" />
+                        </Border>
+                        <TextBlock x:Name="NavAddText" Text="添加密钥" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="14.5" />
                     </StackPanel>
                 </ListBoxItem>
-                <ListBoxItem Padding="10,11">
+                <ListBoxItem Padding="0,11">
                     <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="Cog" Width="22" Height="22" VerticalAlignment="Center" />
-                        <TextBlock Text="设置" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="14.5" />
+                        <Border Width="42" Height="22">
+                            <materialDesign:PackIcon Kind="Cog" Width="22" Height="22" HorizontalAlignment="Center" />
+                        </Border>
+                        <TextBlock x:Name="NavSettingsText" Text="设置" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="14.5" />
                     </StackPanel>
                 </ListBoxItem>
-                <ListBoxItem Padding="10,11">
+                <ListBoxItem Padding="0,11">
                     <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="Information" Width="22" Height="22" VerticalAlignment="Center" />
-                        <TextBlock Text="关于" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="14.5" />
+                        <Border Width="42" Height="22">
+                            <materialDesign:PackIcon Kind="Information" Width="22" Height="22" HorizontalAlignment="Center" />
+                        </Border>
+                        <TextBlock x:Name="NavAboutText" Text="关于" Margin="12,0,0,0" VerticalAlignment="Center" FontSize="14.5" />
                     </StackPanel>
                 </ListBoxItem>
             </ListBox>
         </DockPanel>
 
-        <!-- 页面内容 + Snackbar -->
-        <Grid Grid.Column="1">
+        <!-- 顶栏、页面内容 + Snackbar -->
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <Border Grid.Row="0"
+                    Background="{DynamicResource PrimaryHueMidBrush}"
+                    Padding="24,0,18,0">
+                <Grid>
+                    <Button x:Name="CollapseButton"
+                            Width="42"
+                            Height="42"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="折叠导航栏"
+                            Click="CollapseButton_Click">
+                        <materialDesign:PackIcon x:Name="CollapseIcon" Kind="MenuOpen" Width="22" Height="22" />
+                    </Button>
+                    <Button x:Name="LogButton"
+                            Width="42"
+                            Height="42"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="更多操作"
+                            Click="LogButton_Click">
+                        <TextBlock Text="..." FontSize="20" FontWeight="Bold" VerticalAlignment="Center" />
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="导出详细日志" Click="ExportDetailedLog_Click" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.Column="1">
             <Border BorderBrush="{DynamicResource MaterialDesignDivider}" BorderThickness="1,0,0,0" />
-            <ContentControl x:Name="PageHost" Focusable="False" />
+            <ContentControl x:Name="PageHost"
+                            Focusable="False"
+                            Opacity="1"
+                            RenderTransformOrigin="0.5,0.05">
+                <ContentControl.RenderTransform>
+                    <TranslateTransform />
+                </ContentControl.RenderTransform>
+            </ContentControl>
             <materialDesign:Snackbar x:Name="MainSnackbar"
                                      HorizontalAlignment="Center"
                                      VerticalAlignment="Bottom"

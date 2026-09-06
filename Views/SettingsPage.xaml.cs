@@ -233,14 +233,13 @@ public partial class SettingsPage : UserControl
 
     private void RemovePassword_Click(object sender, RoutedEventArgs e)
     {
-        var result = MessageBox.Show(
+        bool confirmed = MaterialDialogService.ShowConfirmation(
             Window.GetWindow(this),
-            "移除访问密码后将回退至 DPAPI 保护，本机其他用户账户将无法读取。确定移除吗？",
             "移除访问密码",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+            "移除访问密码后将回退至 DPAPI 保护，本机其他用户账户将无法读取。确定移除吗？",
+            "确定");
 
-        if (result != MessageBoxResult.Yes) return;
+        if (!confirmed) return;
 
         Vault.Settings.PasswordEnabled = false;
         AppState.Password = null;

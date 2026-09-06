@@ -1,0 +1,17 @@
+<Window x:Class="kEyLite.Views.Dialogs.DialogHostWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Width="520"
+        Height="260"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent">
+    <materialDesign:DialogHost x:Name="DialogHost"
+                               DialogTheme="InPlace">
+        <Grid Background="Transparent" />
+    </materialDesign:DialogHost>
+</Window>

@@ -12,7 +12,7 @@
                        VerticalAlignment="Center" />
                 <StackPanel Margin="18,2,0,0" VerticalAlignment="Center">
                     <TextBlock Text="kEyLite" FontSize="34" FontWeight="SemiBold" />
-                    <TextBlock Text="v0.1-beta - Codename Hyacine" Opacity="0.65" FontSize="14" Margin="0,4,0,0" />
+                    <TextBlock Text="v1.0-preview - Codename Aemeath" Opacity="0.65" FontSize="14" Margin="0,4,0,0" />
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                         <TextBlock Text="Copyright (C) 2026 Startorch Academy Team - Clara Herta"
                                    Opacity="0.6" FontSize="12.5"

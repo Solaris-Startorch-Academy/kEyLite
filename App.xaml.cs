@@ -10,8 +10,10 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.Win32;
+using H.NotifyIcon;
 using kEyLite.Models;
 using kEyLite.Services;
 using kEyLite.Views;
@@ -37,8 +39,7 @@ public partial class App : Application
 
     private Mutex? _mutex;
     private EventWaitHandle? _activateEvent;
-    private System.Windows.Forms.NotifyIcon? _trayIcon;
-    private System.Windows.Forms.ContextMenuStrip? _trayMenu;
+    private TaskbarIcon? _trayIcon;
     private DispatcherTimer? _lockTimer;
     private bool _backgroundKeep;
     private FirstRunAction _pendingFirstRunAction = FirstRunAction.None;
@@ -151,11 +152,11 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            MaterialDialogService.ShowMessage(
+                null,
                 $"无法初始化数据文件：{ex.Message}\n\n文件位置：{VaultService.FilePath}",
                 "kEyLite",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+                MessageDialogKind.Error);
             return false;
         }
     }
@@ -177,12 +178,12 @@ public partial class App : Application
                       || dir.StartsWith(desktop, StringComparison.OrdinalIgnoreCase);
             if (!risky) return;
 
-            MessageBox.Show(
+            MaterialDialogService.ShowMessage(
+                null,
                 "检测到 kEyLite 位于临时文件夹或桌面上！\n\n" +
                 "这些位置的文件可能被异常删除，导致数据丢失。您应该将程序移动到独立的安装目录！",
                 "建议更改程序位置",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+                MessageDialogKind.Warning);
         }
         catch
         {
@@ -241,7 +242,11 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"导入失败：{ex.Message}", "kEyLite", MessageBoxButton.OK, MessageBoxImage.Error);
+            MaterialDialogService.ShowMessage(
+                kEyLite.MainWindow.Instance,
+                "kEyLite",
+                $"导入失败：{ex.Message}",
+                MessageDialogKind.Error);
             return false;
         }
     }
@@ -314,20 +319,14 @@ public partial class App : Application
     {
         try
         {
-            _trayMenu = BuildTrayMenu();
-
-            _trayIcon = new System.Windows.Forms.NotifyIcon
+            _trayIcon = new TaskbarIcon
             {
-                Text = "kEyLite - 运行中",
-                Icon = LoadTrayIcon(),
-                Visible = true,
+                ToolTipText = "kEyLite - 主程序",
+                IconSource = new BitmapImage(new Uri(
+                    "pack://application:,,,/kEyLite;component/Assets/App.ico")),
+                ContextMenu = BuildTrayMenu(),
             };
-            _trayIcon.DoubleClick += (_, _) => ActivateMainWindow();
-            _trayIcon.MouseUp += (_, args) =>
-            {
-                if (args.Button == System.Windows.Forms.MouseButtons.Right)
-                    _trayMenu?.Show(System.Windows.Forms.Cursor.Position);
-            };
+            _trayIcon.TrayMouseDoubleClick += (_, _) => ActivateMainWindow();
         }
         catch
         {
@@ -335,46 +334,45 @@ public partial class App : Application
         }
     }
 
-    private System.Windows.Forms.ContextMenuStrip BuildTrayMenu()
+    private System.Windows.Controls.ContextMenu BuildTrayMenu()
     {
-        bool dark = IsDarkTheme;
-        var menu = new System.Windows.Forms.ContextMenuStrip();
+        var menu = new System.Windows.Controls.ContextMenu();
 
-        // 尽量贴近当前明暗主题
-        menu.BackColor = dark
-            ? System.Drawing.Color.FromArgb(40, 40, 40)
-            : System.Drawing.Color.White;
-        menu.ForeColor = dark
-            ? System.Drawing.Color.FromArgb(235, 235, 235)
-            : System.Drawing.Color.FromArgb(32, 32, 32);
+        menu.SetResourceReference(System.Windows.Controls.Control.BackgroundProperty, "MaterialDesignPaper");
+        menu.SetResourceReference(System.Windows.Controls.Control.ForegroundProperty, "MaterialDesignBody");
 
-        menu.Items.Add("打开主页面", null, (_, _) => ActivateMainWindow());
-        menu.Items.Add("设置", null, (_, _) =>
+        var menuItemStyle = new System.Windows.Style(typeof(System.Windows.Controls.MenuItem));
+        menuItemStyle.Setters.Add(new System.Windows.Setter(
+            System.Windows.Controls.Control.BackgroundProperty,
+            new System.Windows.DynamicResourceExtension("MaterialDesignPaper")));
+        menuItemStyle.Setters.Add(new System.Windows.Setter(
+            System.Windows.Controls.Control.ForegroundProperty,
+            new System.Windows.DynamicResourceExtension("MaterialDesignBody")));
+        menu.Resources.Add(typeof(System.Windows.Controls.MenuItem), menuItemStyle);
+
+        menu.Items.Add(new MenuItem { Header = "kEyLite", IsEnabled = false });
+        menu.Items.Add(new Separator());
+        var openItem = new System.Windows.Controls.MenuItem { Header = "打开主页面" };
+        openItem.Click += (_, _) => ActivateMainWindow();
+        menu.Items.Add(openItem);
+
+        var settingsItem = new System.Windows.Controls.MenuItem { Header = "设置" };
+        settingsItem.Click += (_, _) =>
         {
             ActivateMainWindow();
             if (!AppState.IsLocked) kEyLite.MainWindow.Instance?.ShowPage(2);
-        });
-        menu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
-        menu.Items.Add("重启", null, (_, _) => RestartApp());
-        menu.Items.Add("退出", null, (_, _) => ExitApp());
+        };
+        menu.Items.Add(settingsItem);
+        menu.Items.Add(new System.Windows.Controls.Separator());
+
+        var restartItem = new System.Windows.Controls.MenuItem { Header = "重启" };
+        restartItem.Click += (_, _) => RestartApp();
+        menu.Items.Add(restartItem);
+
+        var exitItem = new System.Windows.Controls.MenuItem { Header = "退出" };
+        exitItem.Click += (_, _) => ExitApp();
+        menu.Items.Add(exitItem);
         return menu;
-    }
-
-    private static System.Drawing.Icon LoadTrayIcon()
-    {
-        try
-        {
-            string? exe = Environment.ProcessPath;
-            if (exe is not null)
-            {
-                var icon = System.Drawing.Icon.ExtractAssociatedIcon(exe);
-                if (icon is not null) return icon;
-            }
-        }
-        catch { /* 回退到资源 */ }
-
-        var sri = GetResourceStream(new Uri("pack://application:,,,/kEyLite;component/Assets/App.ico"));
-        return new System.Drawing.Icon(sri.Stream);
     }
 
     // ————————————————————————————— 重启 / 退出 —————————————————————————————
@@ -386,7 +384,11 @@ public partial class App : Application
             string? exe = Environment.ProcessPath;
             if (string.IsNullOrEmpty(exe))
             {
-                MessageBox.Show("无法获取程序路径，重启失败。", "kEyLite", MessageBoxButton.OK, MessageBoxImage.Error);
+                MaterialDialogService.ShowMessage(
+                    kEyLite.MainWindow.Instance,
+                    "kEyLite",
+                    "重启时出现严重错误！",
+                    MessageDialogKind.Error);
                 return;
             }
 
@@ -397,7 +399,11 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"重启失败：{ex.Message}", "kEyLite", MessageBoxButton.OK, MessageBoxImage.Error);
+            MaterialDialogService.ShowMessage(
+                kEyLite.MainWindow.Instance,
+                "重启失败",
+                ex.Message,
+                MessageDialogKind.Error);
         }
     }
 
@@ -417,7 +423,6 @@ public partial class App : Application
         {
             try
             {
-                _trayIcon.Visible = false;
                 _trayIcon.Dispose();
             }
             catch { /* 忽略 */ }

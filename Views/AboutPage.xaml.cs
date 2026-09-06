@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using kEyLite.Services;
+using kEyLite.Views.Dialogs;
 
 namespace kEyLite.Views;
 
@@ -38,11 +39,11 @@ public partial class AboutPage : UserControl
             string source = Path.GetFullPath(Path.Combine(appDir, "..", "..", "..", "Assets", "Fonts", "LICENSE.txt"));
             if (!File.Exists(source))
             {
-                MessageBox.Show(Window.GetWindow(this),
-                    "未能找到字体许可证文件 Assets/Fonts/LICENSE.txt。",
+                MaterialDialogService.ShowMessage(
+                    Window.GetWindow(this),
                     "kEyLite",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
+                    "未能找到字体许可证文件 Assets/Fonts/LICENSE.txt。",
+                    MessageDialogKind.Warning);
                 return;
             }
             path = source;

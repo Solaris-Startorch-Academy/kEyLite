@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite\\kEyLite.csproj": {}
+    "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite.csproj": {}
   },
   "projects": {
-    "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite\\kEyLite.csproj": {
-      "version": "0.1.0-beta",
+    "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite.csproj": {
+      "version": "1.0.0-preview",
       "restore": {
-        "projectUniqueName": "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite\\kEyLite.csproj",
+        "projectUniqueName": "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite.csproj",
         "projectName": "kEyLite",
-        "projectPath": "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite\\kEyLite.csproj",
+        "projectPath": "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite.csproj",
         "packagesPath": "C:\\Users\\xiepe\\.nuget\\packages\\",
-        "outputPath": "E:\\PeichenXie\\Documents\\kEyLite\\kEyLite\\obj\\",
+        "outputPath": "E:\\PeichenXie\\Documents\\kEyLite\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "E:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -50,6 +50,10 @@
         "net9.0-windows7.0": {
           "targetAlias": "net9.0-windows",
           "dependencies": {
+            "H.NotifyIcon.Wpf": {
+              "target": "Package",
+              "version": "[2.4.1, )"
+            },
             "MaterialDesignThemes": {
               "target": "Package",
               "version": "[5.2.1, )"
@@ -78,7 +82,7 @@
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             },
-            "Microsoft.WindowsDesktop.App": {
+            "Microsoft.WindowsDesktop.App.WPF": {
               "privateAssets": "none"
             }
           },

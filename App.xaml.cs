@@ -11,6 +11,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -28,6 +29,7 @@ public partial class App : Application
     private const string MutexId = "kEyLite_SingleInstance_6C3F2C1E";
     private const string ActivateId = "kEyLite_SingleInstance_Activate";
     private const int HotkeyId = 0x4B45;
+    private const int LockHotkeyId = 0x4B46;
     private const int WmHotkey = 0x0312;
     private const uint ModControl = 0x0002;
     private const uint ModShift = 0x0004;
@@ -40,8 +42,6 @@ public partial class App : Application
     /// <summary>应用是否正在退出（用于区分“关闭窗口”与“退出程序”）。</summary>
     public static bool IsExiting { get; private set; }
 
-    /// <summary>当前是否处于“保留后台”模式。</summary>
-    public bool BackgroundKeepActive => _backgroundKeep;
     public bool IsDarkTheme { get; set; }
 
     private Mutex? _mutex;
@@ -50,8 +50,10 @@ public partial class App : Application
     private FloatingKeyWindow? _floatingWindow;
     private HwndSource? _hotkeySource;
     private bool _hotkeyRegistered;
+    private bool _lockHotkeyRegistered;
+    private uint _lockHotkeyModifiers;
+    private uint _lockHotkeyVirtualKey;
     private DispatcherTimer? _lockTimer;
-    private bool _backgroundKeep;
     private FirstRunAction _pendingFirstRunAction = FirstRunAction.None;
 
     protected override void OnStartup(StartupEventArgs e)
@@ -84,8 +86,11 @@ public partial class App : Application
 
         bool autostart = e.Args.Any(a => string.Equals(a, "--autostart", StringComparison.OrdinalIgnoreCase));
 
-        // 解锁状态变化时同步后台模式开关
-        AppState.Unlocked += () => _backgroundKeep = AppState.Vault?.Settings.BackgroundKeep ?? false;
+        // 解锁状态变化时同步锁定快捷键
+        AppState.Unlocked += () =>
+        {
+            ApplyLockHotkeySetting();
+        };
 
         // 首启对话框以模态显示且主窗口尚未创建：若保持 OnLastWindowClose，
         // 对话框关闭会被判定为“最后一个窗口关闭”而调度应用关闭，
@@ -93,9 +98,6 @@ public partial class App : Application
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         if (!InitVault()) { ExitApp(); return; }
-
-        var vault = AppState.Vault;
-        _backgroundKeep = vault?.Settings.BackgroundKeep ?? false;
 
         if (autostart)
         {
@@ -325,6 +327,49 @@ public partial class App : Application
         AppState.Lock();
     }
 
+    public bool TrySetLockHotkey(string shortcut, out string error)
+    {
+        error = "";
+        if (!TryParseHotkey(shortcut, out uint modifiers, out uint virtualKey))
+        {
+            error = "快捷键格式无效，请使用 Ctrl+Shift+L 这样的格式。";
+            return false;
+        }
+
+        if (_hotkeySource is null)
+        {
+            error = "快捷键服务尚未初始化，请稍后重试。";
+            return false;
+        }
+
+        bool hadOldHotkey = _lockHotkeyRegistered;
+        if (hadOldHotkey)
+        {
+            UnregisterHotKey(_hotkeySource.Handle, LockHotkeyId);
+            _lockHotkeyRegistered = false;
+        }
+
+        if (!RegisterHotKey(_hotkeySource.Handle, LockHotkeyId, modifiers, virtualKey))
+        {
+            if (hadOldHotkey)
+            {
+                _lockHotkeyRegistered = RegisterHotKey(
+                    _hotkeySource.Handle,
+                    LockHotkeyId,
+                    _lockHotkeyModifiers,
+                    _lockHotkeyVirtualKey);
+            }
+
+            error = "快捷键注册失败，可能已被其他程序占用。";
+            return false;
+        }
+
+        _lockHotkeyModifiers = modifiers;
+        _lockHotkeyVirtualKey = virtualKey;
+        _lockHotkeyRegistered = true;
+        return true;
+    }
+
     public void ToggleFloatingWindow()
     {
         if (IsExiting) return;
@@ -372,6 +417,39 @@ public partial class App : Application
             HotkeyId,
             ModControl | ModShift,
             VkK);
+        ApplyLockHotkeySetting();
+    }
+
+    private void ApplyLockHotkeySetting()
+    {
+        string shortcut = AppState.Vault?.Settings.LockHotkey ?? "Ctrl+Shift+L";
+        if (!TrySetLockHotkey(shortcut, out _))
+            TrySetLockHotkey("Ctrl+Shift+L", out _);
+    }
+
+    private static bool TryParseHotkey(string shortcut, out uint modifiers, out uint virtualKey)
+    {
+        modifiers = 0;
+        virtualKey = 0;
+
+        try
+        {
+            if (new KeyGestureConverter().ConvertFromString(shortcut) is not KeyGesture gesture ||
+                gesture.Key == Key.None || gesture.Modifiers == ModifierKeys.None)
+                return false;
+
+            if ((gesture.Modifiers & ModifierKeys.Control) != 0) modifiers |= ModControl;
+            if ((gesture.Modifiers & ModifierKeys.Shift) != 0) modifiers |= ModShift;
+            if ((gesture.Modifiers & ModifierKeys.Alt) != 0) modifiers |= 0x0001;
+            if ((gesture.Modifiers & ModifierKeys.Windows) != 0) modifiers |= 0x0008;
+
+            virtualKey = (uint)KeyInterop.VirtualKeyFromKey(gesture.Key);
+            return virtualKey != 0;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     private IntPtr HotkeyWindowProc(
@@ -386,11 +464,15 @@ public partial class App : Application
             ToggleFloatingWindow();
             handled = true;
         }
+        else if (message == WmHotkey && wParam.ToInt32() == LockHotkeyId)
+        {
+            LockNow();
+            kEyLite.MainWindow.Instance?.Hide();
+            handled = true;
+        }
 
         return IntPtr.Zero;
     }
-
-    public void SetBackgroundKeep(bool value) => _backgroundKeep = value;
 
     /// <summary>锁定时间设置变化后，若窗口当前处于隐藏状态则重新计划。</summary>
     public void RescheduleLockIfHidden()
@@ -514,6 +596,8 @@ public partial class App : Application
 
         if (_hotkeyRegistered && _hotkeySource is not null)
             UnregisterHotKey(_hotkeySource.Handle, HotkeyId);
+        if (_lockHotkeyRegistered && _hotkeySource is not null)
+            UnregisterHotKey(_hotkeySource.Handle, LockHotkeyId);
         _hotkeySource?.RemoveHook(HotkeyWindowProc);
         _hotkeySource?.Dispose();
         _hotkeySource = null;

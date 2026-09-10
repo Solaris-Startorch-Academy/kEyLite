@@ -12,14 +12,14 @@ public class AppSettings
     /// <summary>复制验证码后自动清空剪贴板的秒数；0 表示不启用。</summary>
     public int ClipboardClearSeconds { get; set; } = 30;
 
-    /// <summary>关闭主页面后保留至后台（托盘）运行。</summary>
-    public bool BackgroundKeep { get; set; }
-
-    /// <summary>开机自动启动（仅允许在启用 BackgroundKeep 时开启）。</summary>
+    /// <summary>是否开机自动启动并驻留托盘。</summary>
     public bool AutoStart { get; set; }
 
     /// <summary>关闭主页面后自动锁定的分钟数：0 = 立即锁定，-1 = 从不。</summary>
     public int LockTimeoutMinutes { get; set; } = 5;
+
+    /// <summary>全局锁定快捷键，使用 WPF KeyGesture 格式。</summary>
+    public string LockHotkey { get; set; } = "Ctrl+Shift+L";
 
     /// <summary>Material Design 主色 Swatch 名称（默认天蓝色 lightBlue）。</summary>
     public string PrimaryColor { get; set; } = "lightBlue";

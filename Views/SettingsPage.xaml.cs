@@ -49,8 +49,8 @@ public partial class SettingsPage : UserControl
         SelectByTag(ClipboardClearBox, clear);
 
         SelectByTag(LockTimeoutBox, s.LockTimeoutMinutes);
+        LockHotkeyBox.Text = s.LockHotkey;
 
-        BackgroundKeepToggle.IsChecked = s.BackgroundKeep;
         AutoStartToggle.IsChecked = s.AutoStart;
         UpdateAutoStartUi();
 
@@ -333,33 +333,6 @@ public partial class SettingsPage : UserControl
 
     // ---------- 后台与启动 ----------
 
-    private void BackgroundKeep_Checked(object sender, RoutedEventArgs e) => SetBackgroundKeep(true);
-    private void BackgroundKeep_Unchecked(object sender, RoutedEventArgs e) => SetBackgroundKeep(false);
-
-    private void SetBackgroundKeep(bool value)
-    {
-        if (!_initialized) return;
-        var s = Vault.Settings;
-        if (s.BackgroundKeep == value) return;
-
-        s.BackgroundKeep = value;
-        App.Instance.SetBackgroundKeep(value);
-
-        // 依赖约束：关闭保留后台时必须同时关闭开机自启
-        if (!value && s.AutoStart)
-        {
-            try
-            {
-                AutostartService.SetEnabled(false);
-                s.AutoStart = false;
-            }
-            catch { /* 注册表操作失败时保持原状 */ }
-        }
-
-        AppState.Save();
-        UpdateAutoStartUi();
-    }
-
     private void AutoStart_Checked(object sender, RoutedEventArgs e) => SetAutoStart(true);
     private void AutoStart_Unchecked(object sender, RoutedEventArgs e) => SetAutoStart(false);
 
@@ -389,8 +362,7 @@ public partial class SettingsPage : UserControl
 
     private void UpdateAutoStartUi()
     {
-        bool keep = AppState.Vault?.Settings.BackgroundKeep ?? false;
-        AutoStartToggle.IsEnabled = keep;
+        AutoStartToggle.IsEnabled = true;
     }
 
     // ---------- 高级 ----------
@@ -420,6 +392,21 @@ public partial class SettingsPage : UserControl
             Vault.Settings.ClipboardClearSeconds = value;
             AppState.Save();
         }
+    }
+
+    private void ApplyLockHotkey_Click(object sender, RoutedEventArgs e)
+    {
+        string shortcut = LockHotkeyBox.Text.Trim();
+        if (!App.Instance.TrySetLockHotkey(shortcut, out string error))
+        {
+            LockHotkeyBox.Text = Vault.Settings.LockHotkey;
+            MainWindow.Instance?.Enqueue(error);
+            return;
+        }
+
+        Vault.Settings.LockHotkey = shortcut;
+        AppState.Save();
+        MainWindow.Instance?.Enqueue($"锁定快捷键已设置为 {shortcut}");
     }
 
     private void OpenDataFolder_Click(object sender, RoutedEventArgs e)

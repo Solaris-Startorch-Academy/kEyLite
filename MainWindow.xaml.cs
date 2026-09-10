@@ -245,7 +245,7 @@ public partial class MainWindow : Window
             .AppendLine("--------")
             .AppendLine($"保险库已解锁: {!AppState.IsLocked}")
             .AppendLine($"密钥数量: {AppState.Vault?.Keys.Count ?? 0}")
-            .AppendLine($"保留至后台: {App.Instance.BackgroundKeepActive}")
+            .AppendLine("后台驻留: true")
             .AppendLine($"当前页面: {_currentPageTitle}")
             .AppendLine($"主题模式: {settings?.ThemeMode ?? "未知"}")
             .AppendLine($"主色: {settings?.PrimaryColor ?? "未知"}")
@@ -268,12 +268,8 @@ public partial class MainWindow : Window
     {
         if (App.IsExiting) return;
 
-        // 保留后台：隐藏到托盘并启动锁定倒计时；否则直接退出应用
-        if (App.Instance.BackgroundKeepActive)
-        {
-            e.Cancel = true;
-            Hide();
-            App.Instance.OnMainWindowHiddenToTray();
-        }
+        e.Cancel = true;
+        Hide();
+        App.Instance.OnMainWindowHiddenToTray();
     }
 }

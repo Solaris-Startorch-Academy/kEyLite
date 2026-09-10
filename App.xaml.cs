@@ -7,9 +7,11 @@
 
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Microsoft.Win32;
@@ -25,6 +27,11 @@ public partial class App : Application
 {
     private const string MutexId = "kEyLite_SingleInstance_6C3F2C1E";
     private const string ActivateId = "kEyLite_SingleInstance_Activate";
+    private const int HotkeyId = 0x4B45;
+    private const int WmHotkey = 0x0312;
+    private const uint ModControl = 0x0002;
+    private const uint ModShift = 0x0004;
+    private const uint VkK = 0x4B;
 
     private enum FirstRunAction { None, ShowAddPage }
 
@@ -40,6 +47,9 @@ public partial class App : Application
     private Mutex? _mutex;
     private EventWaitHandle? _activateEvent;
     private TaskbarIcon? _trayIcon;
+    private FloatingKeyWindow? _floatingWindow;
+    private HwndSource? _hotkeySource;
+    private bool _hotkeyRegistered;
     private DispatcherTimer? _lockTimer;
     private bool _backgroundKeep;
     private FirstRunAction _pendingFirstRunAction = FirstRunAction.None;
@@ -87,8 +97,6 @@ public partial class App : Application
         var vault = AppState.Vault;
         _backgroundKeep = vault?.Settings.BackgroundKeep ?? false;
 
-        InitTrayIcon();
-
         if (autostart)
         {
             // 开机自启：驻留托盘，不创建窗口、不要求输入密码；
@@ -99,7 +107,11 @@ public partial class App : Application
             ActivateMainWindow();
         }
 
-        ShutdownMode = ShutdownMode.OnLastWindowClose;
+        InitTrayIcon();
+        RegisterGlobalHotkey();
+
+        // 应用包含托盘和浮窗，生命周期由 ExitApp 显式控制。
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
     }
 
     // ————————————————————————————— 启动 / 初始化 —————————————————————————————
@@ -282,13 +294,28 @@ public partial class App : Application
     {
         try { AppState.Save(); } catch { /* 密码会话可能已失效 */ }
 
+        if (IsAuxiliaryWindowVisible())
+        {
+            StopLockTimer();
+            return;
+        }
+
         int minutes = AppState.Vault?.Settings.LockTimeoutMinutes ?? 5;
         if (minutes < 0) return;      // 从不锁定
         if (minutes == 0) { LockNow(); return; }
 
         StopLockTimer();
         _lockTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(minutes) };
-        _lockTimer.Tick += (_, _) => LockNow();
+        _lockTimer.Tick += (_, _) =>
+        {
+            if (IsAuxiliaryWindowVisible())
+            {
+                StopLockTimer();
+                return;
+            }
+
+            LockNow();
+        };
         _lockTimer.Start();
     }
 
@@ -296,6 +323,71 @@ public partial class App : Application
     {
         StopLockTimer();
         AppState.Lock();
+    }
+
+    public void ToggleFloatingWindow()
+    {
+        if (IsExiting) return;
+
+        if (AppState.IsLocked)
+        {
+            ActivateMainWindow();
+            return;
+        }
+
+        if (_floatingWindow is { IsVisible: true })
+        {
+            _floatingWindow.Activate();
+            return;
+        }
+
+        _floatingWindow = new FloatingKeyWindow();
+        _floatingWindow.Show();
+        _floatingWindow.Activate();
+        StopLockTimer();
+    }
+
+    public void OnFloatingWindowClosed(FloatingKeyWindow window)
+    {
+        if (ReferenceEquals(_floatingWindow, window))
+            _floatingWindow = null;
+
+        if (kEyLite.MainWindow.Instance is { IsVisible: false } && !AppState.IsLocked && !IsExiting)
+            OnMainWindowHiddenToTray();
+    }
+
+    private bool IsAuxiliaryWindowVisible()
+        => _floatingWindow is { IsVisible: true };
+
+    private void RegisterGlobalHotkey()
+    {
+        var parameters = new HwndSourceParameters("kEyLiteHotkey")
+        {
+            WindowStyle = 0,
+        };
+        _hotkeySource = new HwndSource(parameters);
+        _hotkeySource.AddHook(HotkeyWindowProc);
+        _hotkeyRegistered = RegisterHotKey(
+            _hotkeySource.Handle,
+            HotkeyId,
+            ModControl | ModShift,
+            VkK);
+    }
+
+    private IntPtr HotkeyWindowProc(
+        IntPtr hwnd,
+        int message,
+        IntPtr wParam,
+        IntPtr lParam,
+        ref bool handled)
+    {
+        if (message == WmHotkey && wParam.ToInt32() == HotkeyId)
+        {
+            ToggleFloatingWindow();
+            handled = true;
+        }
+
+        return IntPtr.Zero;
     }
 
     public void SetBackgroundKeep(bool value) => _backgroundKeep = value;
@@ -420,6 +512,15 @@ public partial class App : Application
     {
         IsExiting = true;
 
+        if (_hotkeyRegistered && _hotkeySource is not null)
+            UnregisterHotKey(_hotkeySource.Handle, HotkeyId);
+        _hotkeySource?.RemoveHook(HotkeyWindowProc);
+        _hotkeySource?.Dispose();
+        _hotkeySource = null;
+
+        _floatingWindow?.Close();
+        _floatingWindow = null;
+
         if (_trayIcon is not null)
         {
             try
@@ -435,4 +536,10 @@ public partial class App : Application
 
         base.OnExit(e);
     }
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 }

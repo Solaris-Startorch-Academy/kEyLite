@@ -98,21 +98,37 @@
                             Click="CollapseButton_Click">
                         <materialDesign:PackIcon x:Name="CollapseIcon" Kind="MenuOpen" Width="22" Height="22" />
                     </Button>
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <Button x:Name="FloatingButton"
+                            Width="42"
+                            Height="42"
+                            Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="打开浮窗 (Ctrl+Shift+K)"
+                            Click="FloatingButton_Click">
+                        <materialDesign:PackIcon Kind="PictureInPictureBottomRightOutline" Width="20" Height="20" />
+                    </Button>
+                    <Button x:Name="LockButton"
+                            Width="42"
+                            Height="42"
+                            Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="锁定 kEyLite"
+                            Click="LockButton_Click">
+                        <materialDesign:PackIcon Kind="LockOutline" Width="20" Height="20" />
+                    </Button>
                     <Button x:Name="LogButton"
                             Width="42"
                             Height="42"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Center"
                             Style="{StaticResource MaterialDesignIconButton}"
                             ToolTip="更多操作"
                             Click="LogButton_Click">
-                        <TextBlock Text="..." FontSize="20" FontWeight="Bold" VerticalAlignment="Center" />
+                        <materialDesign:PackIcon Kind="FileDocumentOutline" Width="20" Height="20" />
                         <Button.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="导出详细日志" Click="ExportDetailedLog_Click" />
                             </ContextMenu>
                         </Button.ContextMenu>
                     </Button>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Grid>

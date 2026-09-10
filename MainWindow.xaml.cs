@@ -153,11 +153,6 @@ public partial class MainWindow : Window
             foreach (var element in textElements)
             {
                 var fade = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(120));
-                fade.Completed += (_, _) =>
-                {
-                    if (animationVersion == _navAnimationVersion && _navCollapsed)
-                        element.Visibility = Visibility.Collapsed;
-                };
                 element.BeginAnimation(UIElement.OpacityProperty, fade);
             }
         }
@@ -205,6 +200,15 @@ public partial class MainWindow : Window
             menu.PlacementTarget = button;
             menu.IsOpen = true;
         }
+    }
+
+    private void FloatingButton_Click(object sender, RoutedEventArgs e)
+        => App.Instance.ToggleFloatingWindow();
+
+    private void LockButton_Click(object sender, RoutedEventArgs e)
+    {
+        App.Instance.LockNow();
+        Hide();
     }
 
     private void ExportDetailedLog_Click(object sender, RoutedEventArgs e)

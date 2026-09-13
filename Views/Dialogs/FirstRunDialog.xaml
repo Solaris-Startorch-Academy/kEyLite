@@ -19,7 +19,7 @@
             <TextBlock Text="kEyLite" FontSize="24" FontWeight="SemiBold"
                        Margin="10,0,0,0" VerticalAlignment="Center" />
         </StackPanel>
-        <TextBlock Text="v1.0-preview - Codename Aemeath"
+        <TextBlock Text="v1.1.0 - Codename Aemeath"
                    HorizontalAlignment="Center" Opacity="0.6" Margin="0,6,0,0" FontSize="12.5" />
 
         <TextBlock Margin="0,18,0,0" TextWrapping="Wrap" TextAlignment="Center" Opacity="0.85"

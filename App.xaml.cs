@@ -382,7 +382,7 @@ public partial class App : Application
 
         if (_floatingWindow is { IsVisible: true })
         {
-            _floatingWindow.Activate();
+            ActivateMainWindow();
             return;
         }
 

@@ -37,7 +37,7 @@
                                Margin="10,0,0,0" VerticalAlignment="Center" />
                 </StackPanel>
                       <TextBlock x:Name="VersionText"
-                              Text="v1.0-preview"
+                              Text="v1.1.0"
                            Margin="4,8,0,0" Opacity="0.6" FontSize="12" />
             </StackPanel>
 

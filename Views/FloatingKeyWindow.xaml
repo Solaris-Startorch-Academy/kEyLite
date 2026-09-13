@@ -32,7 +32,7 @@
                     <TextBlock Text="快速概览"
                                FontSize="20"
                                FontWeight="SemiBold" />
-                    <TextBlock Text="使用 Ctrl+Shift+K 操作！"
+                    <TextBlock Text="按下 Ctrl+Shift+K 就能打开了！"
                                Margin="0,3,0,0"
                                Opacity="0.6"
                                FontSize="12" />

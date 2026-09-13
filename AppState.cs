@@ -32,6 +32,8 @@ public static class AppState
     public static void Lock()
     {
         if (Vault is null) return;
+        if (!Vault.Settings.PasswordEnabled) return;
+
         Vault = null;
         Password = null;
         Locked?.Invoke();

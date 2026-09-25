@@ -9,6 +9,7 @@
 软件名字是"Key"和"Elite"的合成词。（一开始也想过叫Kelite，但这好像KDE的软件会起的名字）\
 目前的版本开发代号是 Aemeath（爱弥斯）。 \
 另注：本人目前没有计划将其移植至 Linux 平台，在 Linux 上可以使用考虑 KDE 的 [Keysmith](https://apps.kde.org/zh-cn/keysmith/)。 \
+本应用的图标来自游戏《[明日方舟](https://ak.hypergryph.com)》中的角色[“予愿安洁莉娜”](https://prts.wiki/w/Angelina_the_Mellow_Wish)。
 
 > [!note]
 > 这个软件的开发过程融合了三种代码：\

@@ -16,8 +16,17 @@
     <AssemblyVersion>1.1.0.0</AssemblyVersion>
     <InformationalVersion>v1.1.0 - Codename Aemeath</InformationalVersion>
     <Copyright>Copyright © 2026 Startorch Academy Team - Clara Herta</Copyright>
+    <Authors>Startorch Academy Team - Clara Herta</Authors>
+    <RepositoryUrl>https://github.com/Solaris-Startorch-Academy/kEyLite</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>kEyLite - A simple, lightweight desktop 2FA application.</Description>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
     <ApplicationIcon>Assets\App.ico</ApplicationIcon>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <DebugType>embedded</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,7 +45,9 @@
     <Resource Include="Assets\Stickers\*.png" />
     <Resource Include="Assets\AppLogo.png" />
     <Resource Include="Assets\App.ico" />
-    <Resource Include="Assets\Fonts\LICENSE.txt" />
+    <EmbeddedResource Include="Assets\Fonts\LICENSE.txt">
+      <LogicalName>kEyLite.Assets.Fonts.LICENSE.txt</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

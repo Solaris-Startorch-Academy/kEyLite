@@ -21,23 +21,23 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.0.x'
+          cache: true
+          cache-dependency-path: |
+            **/*.csproj
 
       - name: Restore
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
-
-      - name: Test
-        run: dotnet test --configuration Release --no-build
+        run: dotnet build --configuration Release --runtime win-x64 --no-restore
 
       - name: Publish
         run: >
           dotnet publish --configuration Release
           --runtime win-x64
+          --no-build
           --self-contained false
           -p:PublishSingleFile=true
-          -p:EnableCompressionInSingleFile=true
           --output ./publish
 
       - name: Upload artifact

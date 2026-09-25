@@ -101,6 +101,9 @@ public partial class FloatingKeyWindow : Window
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
+    private void OpenMainWindow_Click(object sender, RoutedEventArgs e)
+        => App.Instance.ActivateMainWindow();
+
     private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         => App.Instance.OnFloatingWindowClosed(this);
 }

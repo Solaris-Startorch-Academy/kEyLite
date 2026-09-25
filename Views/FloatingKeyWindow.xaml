@@ -37,12 +37,19 @@
                                Opacity="0.6"
                                FontSize="12" />
                 </StackPanel>
-                <Button HorizontalAlignment="Right"
-                        Style="{StaticResource MaterialDesignIconButton}"
-                        ToolTip="关闭浮窗"
-                        Click="Close_Click">
-                    <materialDesign:PackIcon Kind="Close" Width="18" Height="18" />
-                </Button>
+                <StackPanel HorizontalAlignment="Right"
+                            Orientation="Horizontal">
+                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="打开主页面"
+                            Click="OpenMainWindow_Click">
+                        <materialDesign:PackIcon Kind="WindowMaximize" Width="18" Height="18" />
+                    </Button>
+                    <Button Style="{StaticResource MaterialDesignIconButton}"
+                            ToolTip="关闭浮窗"
+                            Click="Close_Click">
+                        <materialDesign:PackIcon Kind="Close" Width="18" Height="18" />
+                    </Button>
+                </StackPanel>
             </Grid>
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto"

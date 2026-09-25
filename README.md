@@ -8,7 +8,12 @@
 目标是升级至 Avalonia 和 Fluent Design，从而实现跨平台。 \
 软件名字是"Key"和"Elite"的合成词。（一开始也想过叫Kelite，但这好像KDE的软件会起的名字）\
 目前的版本开发代号是 Aemeath（爱弥斯）。 \
-另注：本人目前没有计划将其移植至 Linux 平台，在 Linux 上可以使用考虑 KDE 的 [Keysmith](https://apps.kde.org/zh-cn/keysmith/)。
+另注：本人目前没有计划将其移植至 Linux 平台，在 Linux 上可以使用考虑 KDE 的 [Keysmith](https://apps.kde.org/zh-cn/keysmith/)。 \
+
+> [!note]
+> 这个软件的开发过程融合了三种代码：\
+> TRAE 提供的~~疑似豆包的~~模型；GitHub Copilot 提供的 GPT-5.6 Luna；本人自己手写的内容。 \
+> 因此可能有些代码会有点诡异。
 
 ## 能实现什么功能？
 

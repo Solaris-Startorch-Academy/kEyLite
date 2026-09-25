@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net9.0-windows10.0.17763.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -36,9 +36,7 @@
     <Resource Include="Assets\Stickers\*.png" />
     <Resource Include="Assets\AppLogo.png" />
     <Resource Include="Assets\App.ico" />
-    <None Include="Assets\Fonts\LICENSE.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Resource Include="Assets\Fonts\LICENSE.txt" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -30,23 +31,23 @@ public partial class AboutPage : UserControl
     /// <summary>打开随应用分发的 HarmonyOS Sans SC 字体许可证。</summary>
     private void OpenFontLicense_Click(object sender, RoutedEventArgs e)
     {
-        // LICENSE.txt 已标记为 PreserveNewest，因此与 exe 同目录。
-        string appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) ?? "";
-        string path = Path.Combine(appDir, "Assets", "Fonts", "LICENSE.txt");
-        if (!File.Exists(path))
+        const string resourceName = "kEyLite.Assets.Fonts.LICENSE.txt";
+        using Stream? resource = Assembly.GetExecutingAssembly()
+            .GetManifestResourceStream(resourceName);
+        if (resource is null)
         {
-            // 回退：用源码目录里的文件（方便开发时直接运行）
-            string source = Path.GetFullPath(Path.Combine(appDir, "..", "..", "..", "Assets", "Fonts", "LICENSE.txt"));
-            if (!File.Exists(source))
-            {
-                MaterialDialogService.ShowMessage(
-                    Window.GetWindow(this),
-                    "kEyLite",
-                    "未能找到字体许可证文件 Assets/Fonts/LICENSE.txt。",
-                    MessageDialogKind.Warning);
-                return;
-            }
-            path = source;
+            MaterialDialogService.ShowMessage(
+                Window.GetWindow(this),
+                "kEyLite - 注意",
+                "未能找到字体许可证嵌入资源。",
+                MessageDialogKind.Warning);
+            return;
+        }
+
+        string path = Path.Combine(Path.GetTempPath(), "kEyLite-HarmonyOS-Sans-SC-LICENSE.txt");
+        using (FileStream file = File.Create(path))
+        {
+            resource.CopyTo(file);
         }
 
         Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
